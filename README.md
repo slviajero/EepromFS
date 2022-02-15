@@ -26,7 +26,7 @@ The interface to the filesystem is POSIX style. The following public methods are
   
   In addition to this 
   
-  uint8_t rawread(unsigned int a);
+  	uint8_t rawread(unsigned int a);
 	void rawwrite(unsigned int a, uint8_t d);
 	void rawflush();
   
