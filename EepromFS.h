@@ -13,6 +13,9 @@
 
 	Everything is stores as uint8_8.
 
+	One page of 24 bytes if buffered. The pagesize should be less than 
+	30 bytes to fit into one I2C package of the wire library.
+
 */ 
 
 #include <Arduino.h>
@@ -52,7 +55,7 @@ public:
 	uint8_t fclose(char* m);
 	bool eof(uint8_t f);
 	uint8_t fgetc(uint8_t f);
-	bool fputc(uint8_t f, uint8_t ch);
+	bool fputc(uint8_t ch, uint8_t f);
 	bool fflush(uint8_t f);
 	void rewind(uint8_t f);
 
@@ -77,9 +80,12 @@ public:
 	uint8_t debug;
 
 	// raw read and write methods - ought to be private, somehow
+	// currently needed public for testing
 	uint8_t rawread(unsigned int a);
 	void rawwrite(unsigned int a, uint8_t d);
 	void rawflush();
+
+	void (*debugf)(char*, int);
 
 private:
 	// the eeprom address
@@ -103,7 +109,7 @@ private:
 	// the actual file size of the open file
 	unsigned int ofilesize;
 	unsigned int ifilesize;
-	
+
 	// finding files and storage space
 	uint8_t findfile(char* fn);
 	uint8_t findemptyslot();
@@ -116,11 +122,11 @@ private:
 	uint8_t getdata(uint8_t s, unsigned int i);
 	void putdata(uint8_t s, unsigned int i, uint8_t d);
 	
-	// number of slot
+	// number of slots and slotsizes
 	uint8_t nslots;
 	unsigned int slotsize;
 
-	// paging mechanisms
+	// paging mechanism
 	int  pagenumber;
 	bool pagechanged;
 };
