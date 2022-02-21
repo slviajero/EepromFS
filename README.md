@@ -98,7 +98,7 @@ Flushing is done by rawwrite() if needed. After the last write access in a progr
 
 EEPROM are very fast on reading and delivering data. The code contains no timeout delays for reading. All the I2C bus timing is done by the Wire library. 
 
-On write EEPROMS have a typical 10 ms delay until they can accept the next start condition on the bus. This is build into the code. In practice this means that only 100 pages of 16 bytes can be written per second. The maximum update baudrate ot the EEPROM is 4800 baud. The delay can be reduced for some EEPROMs. 10 ms is a typical save value. 
+On write EEPROMs have a typical 10 ms delay until they can accept the next start condition on the bus. This is build into the code. In practice this means that only 100 pages of 16 bytes can be written per second. The maximum update baudrate ot the EEPROM is 12800 baud. The delay can be reduced for some EEPROMs. 10 ms is a typical save value. 
 
 ## Limitations
 
