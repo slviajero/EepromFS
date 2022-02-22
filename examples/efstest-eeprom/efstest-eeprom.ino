@@ -7,6 +7,15 @@ void debug() {
   Serial.print("Debug: "); Serial.println(EFS.debug);
 }
 
+void dump() {
+  for(int i=0; i<99; i++) {
+    if (i%8 == 0) Serial.println();
+    Serial.print((int) EFS.rawread(i)); Serial.write(" "); 
+  }
+  
+  Serial.println();
+}
+
 void setup() {
 
   Serial.begin(9600);
@@ -17,13 +26,17 @@ void setup() {
   Serial.println("Basic EEPROM test ");
 
   // write three pages
-  for (int i=0; i<40; i++) EFS.rawwrite(i, i);
+  for (int i=0; i<60; i++) EFS.rawwrite(i, i);
 
-  // always flush when using raw
+  // always flush when using raw to flush the last 
+  // page
   EFS.rawflush();
 
+  // eeprom function test
+  dump();
+
   // read three pages
-  for (int i=0; i<40; i++) {
+  for (int i=0; i<60; i++) {
      Serial.print(i); Serial.print(" : "); Serial.println(EFS.rawread(i));
   }
 
