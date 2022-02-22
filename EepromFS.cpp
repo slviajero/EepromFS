@@ -6,6 +6,7 @@ EepromFS::EepromFS(uint8_t e, unsigned int sz) {
 	eepromaddr=e;
 	pagenumber=-1;
 	pagechanged=false;
+	ferror=0;
 };
 
 // the raw sequential read method 
@@ -31,7 +32,7 @@ uint8_t EepromFS::rawread(unsigned int a){
 			pagenumber=p;
 			pagechanged=false;
 		} else {
-			debug|=1;
+			ferror|=1;
 			return 0;
 		}
 	}
@@ -49,15 +50,15 @@ void EepromFS::rawwrite(unsigned int a, uint8_t d){
 	pagechanged=true;
 }
 
-// the raw flush methods - sets debug according to transmission status
+// the raw flush methods - sets ferror according to transmission status
 void EepromFS::rawflush(){
 	if (pagechanged) {
 		unsigned int pa=pagenumber*EFS_PAGESIZE;
 		Wire.beginTransmission(eepromaddr);
 		Wire.write((int)pa/256);
 		Wire.write((int)pa%256);
-		if (Wire.write(pagebuffer, EFS_PAGESIZE) == EFS_PAGESIZE) debug|=1;
-		debug+=2*Wire.endTransmission();
+		if (Wire.write(pagebuffer, EFS_PAGESIZE) != EFS_PAGESIZE) ferror|=1;
+		ferror+=2*Wire.endTransmission();
 		delay(10); // the write delay according to the AT24x datasheet
 		pagechanged=false;
 	}
@@ -268,7 +269,6 @@ void EepromFS::putfilename(uint8_t s, char* fn) {
 void EepromFS::clearslotheader(uint8_t s) {
 	unsigned int a=findslot(s);
 	if (a == 0) return;
-	// debugf("** clrslot addr", a);
 	for(uint8_t i=0; i<EFS_FILEHEADERSIZE; i++) rawwrite(a+i, 0); 
 	rawflush();
 }
@@ -314,6 +314,9 @@ int EepromFS::available(uint8_t f) {
 	return 0;
 }
 
+unsigned int EepromFS::size() {
+	return slotsize;
+}
 
 
 

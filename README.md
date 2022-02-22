@@ -34,6 +34,14 @@ In addition to this
 	void rawflush();
   
 can be used for buffered access to individual memory cells much like the EEPROM.read() and EEPROM.update() functions of the Arduino EEPROM library. 
+
+The methods
+
+	uint8_t getdata(uint8_t s, unsigned int i);
+	void putdata(uint8_t s, unsigned int i, uint8_t d);
+	unsigned int EepromFS::size(); 
+
+are an interface to directly access individual slots. 
   
 The filesystem has to be started with the 
 
@@ -49,7 +57,7 @@ Buffer size for EEPROM access is 16 bytes. Maximum filename length is 12 bytes. 
 
 ## POSIX API
 
-The main POSIX style file commands are implemented as methods of the filesystem object. Typical code could look like
+The main POSIX style file commands are implemented as methods of the filesystem object (https://www.cplusplus.com/reference/cstdio/). Typical code could look like
 
 	EepromEFS MyEFS(0x50, 32768);
 	MyEFS.format(16);
@@ -94,11 +102,21 @@ rawflush() will check is the current buffer is changed and flush all 16 bytes to
 
 Flushing is done by rawwrite() if needed. After the last write access in a program, rawflush() has to be done once directly to make sure that the last bytes written are in the EEPROM. Program which run for a long time without any write should rawflush() from time to time to avoid memory loss. 
 
+## Byte API
+
+The data in each slot s can be accessed through 
+
+	uint8_t getdata(uint8_t s, unsigned int i);
+	void putdata(uint8_t s, unsigned int i, uint8_t d);
+	unsigned int EepromFS::size();
+
+The integer i addresses the byte in the slot. Reading or writing outside the slotsize is ignored. size() returns the slotsize of the filesystem. This API is like the EEPROM.read/update interface of the internal EEPROM for an individual slot. 
+
 ## Timing
 
 EEPROM are very fast on reading and delivering data. The code contains no timeout delays for reading. All the I2C bus timing is done by the Wire library. 
 
-On write EEPROMs have a typical 10 ms delay until they can accept the next start condition on the bus. This is build into the code. In practice this means that only 100 pages of 16 bytes can be written per second. The maximum update baudrate ot the EEPROM is 12800 baud. The delay can be reduced for some EEPROMs. 10 ms is a typical save value. 
+On write EEPROMs have a typical 10 ms delay until they can accept the next start condition on the bus. This is build into the code. In practice this means that only 100 pages of 16 bytes can be written per second. The maximum write baudrate ot the EEPROM is 12800 baud. The delay can be reduced for some EEPROMs. 10 ms is a typical save value. The update baudrate of pages can be higher if no bytes are changed and no page write is needed. 
 
 ## Limitations
 

@@ -76,27 +76,28 @@ public:
 	// directory pointer
 	uint8_t dirp;
 
-	// debug flag and function
-	uint8_t debug;
+	// error flag
+	uint8_t ferror;
 
-	// raw read and write methods - ought to be private, somehow
-	// currently needed public for testing
+	// raw read and write methods - bypass the filesystem 
+	// and just offer buffered eeprom access
 	uint8_t rawread(unsigned int a);
 	void rawwrite(unsigned int a, uint8_t d);
 	void rawflush();
 
-	void (*debugf)(char*, int);
+	// slot access interface
+	uint8_t getdata(uint8_t s, unsigned int i);
+	void putdata(uint8_t s, unsigned int i, uint8_t d);
+	unsigned int size();
 
 private:
 	// the eeprom address
 	uint8_t eepromaddr;
 	unsigned int eepromsize;
 
-
 	// headers and files
 	char fnbuffer[EFS_FILENAMELENGTH];
 	uint8_t pagebuffer[EFS_PAGESIZE];
-
 
 	// the slot number of the input and output file
 	uint8_t ifile;
@@ -119,8 +120,6 @@ private:
 	void putfilename(uint8_t s, char* fn);
 	unsigned int getsize(uint8_t s);
 	void putsize(uint8_t s, unsigned int sz);
-	uint8_t getdata(uint8_t s, unsigned int i);
-	void putdata(uint8_t s, unsigned int i, uint8_t d);
 	
 	// number of slots and slotsizes
 	uint8_t nslots;
