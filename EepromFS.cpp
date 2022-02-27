@@ -276,7 +276,7 @@ void EepromFS::clearslotheader(uint8_t s) {
 // get the size bigendian - flush always
 unsigned int EepromFS::getsize(uint8_t s) {
 	unsigned int a=findslot(s);
-	if (a == 0) return;
+	if (a == 0) return 0;
 	return rawread(a+EFS_FILENAMELENGTH+1)+rawread(a+EFS_FILENAMELENGTH+2)*256;
 }
 
