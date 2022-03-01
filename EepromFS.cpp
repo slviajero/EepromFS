@@ -252,6 +252,7 @@ uint8_t EepromFS::getfilename(uint8_t s) {
 	unsigned int a=findslot(s);
 	if (a == 0) return 0;
 	for (i=0; i<EFS_FILENAMELENGTH; i++) if ( (fnbuffer[i]=rawread(a+i)) == 0) break;
+	fnbuffer[i]=0;
 	return i;
 }
 
