@@ -68,12 +68,13 @@ void EepromFS::rawflush(){
 // begin wants a formated filesystem
 uint8_t EepromFS::begin() { 
 	slotsize=0;
+	maxfilesize=0;
 	nslots=0;
 	if (rawread(0) == 'E') {
 		nslots=rawread(1);
 		if (nslots>0) slotsize=(eepromsize-EFS_HEADERSIZE)/nslots;
 	} 
-	if (slotsize>EFS_FILEHEADERSIZE) return nslots; else return 0;
+	if (slotsize>EFS_FILEHEADERSIZE) { maxfilesize=(slotsize - EFS_FILEHEADERSIZE); return nslots; } else return 0;
 }
 
 // zero the entire eeprom 
@@ -88,7 +89,7 @@ bool EepromFS::format(uint8_t s) {
 }
 
 // open and create a file 
-uint8_t EepromFS::fopen(char* fn, char* m) {
+uint8_t EepromFS::fopen(const char* fn, const char* m) {
 	if (*m == 'r') {
 		if(ifile=findfile(fn)) {
 		 	ifilesize=getsize(ifile);
@@ -132,7 +133,7 @@ uint8_t EepromFS::fclose (uint8_t f){
 	return 0;
 }
 
-uint8_t EepromFS::fclose (char* m){
+uint8_t EepromFS::fclose (const char* m){
 	if (*m == 'r') return fclose(ifile); 
 	if (*m == 'w' || *m == 'a') return fclose(ofile);
 }
@@ -152,7 +153,7 @@ uint8_t EepromFS::fgetc(uint8_t f) {
 
 // write a character to the file
 bool EepromFS::fputc(uint8_t ch, uint8_t f){
-	if (f == ofile && ofilepos<slotsize-1) {
+	if (f == ofile && ofilepos<maxfilesize-1) {
 		putdata(ofile, ofilepos++, ch);
 		if (ofilepos>ofilesize) ofilesize++;
 		return true;
@@ -197,7 +198,7 @@ unsigned int EepromFS::filesize(uint8_t f){
 }
 
 // remove a file 
-uint8_t EepromFS::remove(char* fn){
+uint8_t EepromFS::remove(const char* fn){
 	uint8_t file=findfile(fn);
 	if (file != 0) {
 		for(uint8_t i=0; i<EFS_FILENAMELENGTH; i++) fnbuffer[i]=0;
@@ -208,7 +209,7 @@ uint8_t EepromFS::remove(char* fn){
 }
 
 // rename 
-uint8_t EepromFS::rename(char* ofn, char* nfn){
+uint8_t EepromFS::rename(const char* ofn, const char* nfn){
 	uint8_t file=findfile(ofn);
 	putfilename(file, nfn);
 	return file;
@@ -216,7 +217,7 @@ uint8_t EepromFS::rename(char* ofn, char* nfn){
 
 
 // find a file by name or find and empty slot
-uint8_t EepromFS::findfile(char* fn) {
+uint8_t EepromFS::findfile(const char* fn) {
 	for(uint8_t i=1; i<=nslots; i++) {
 		if (getfilename(i)) {
 			bool found = true;
@@ -257,7 +258,7 @@ uint8_t EepromFS::getfilename(uint8_t s) {
 }
 
 // put a filename into a slot and pad the data with 0
-void EepromFS::putfilename(uint8_t s, char* fn) {
+void EepromFS::putfilename(uint8_t s, const char* fn) {
 	uint8_t i;
 	unsigned int a=findslot(s);
 	if (a == 0) return;
@@ -294,14 +295,14 @@ void EepromFS::putsize(uint8_t s, unsigned int sz) {
 uint8_t EepromFS::getdata(uint8_t s, unsigned int i) {
 	unsigned int a=findslot(s);
 	if (a == 0) return 0;
-	if (i>=0 && i<slotsize) return rawread(a+EFS_FILEHEADERSIZE+1+i); else return 0;
+	if (i>=0 && i<maxfilesize) return rawread(a+EFS_FILEHEADERSIZE+1+i); else return 0;
 }
 
 // put one byte of data in a slot
 void EepromFS::putdata(uint8_t s, unsigned int i, uint8_t d){
 	int a=findslot(s);
 	if (a == 0) return;
-	if (i>=0 && i<slotsize) rawwrite(a+EFS_FILEHEADERSIZE+1+i, d);
+	if (i>=0 && i<maxfilesize) rawwrite(a+EFS_FILEHEADERSIZE+1+i, d);
 }
 
 // stream class like available, for output it returns the free bytes
@@ -310,7 +311,7 @@ int EepromFS::available(uint8_t f) {
 		return ifilesize-ifilepos;
 	}
 	if (f == ofile) {
-		return slotsize-ofilesize;
+		return maxfilesize-ofilesize;
 	} 
 	return 0;
 }
@@ -318,10 +319,3 @@ int EepromFS::available(uint8_t f) {
 unsigned int EepromFS::size() {
 	return slotsize;
 }
-
-
-
-
-
-
-

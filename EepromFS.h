@@ -23,7 +23,7 @@
 
 #define EFS_HEADERSIZE 4
 #define EFS_FILENAMELENGTH 12
-#define EFS_FILEHEADERSIZE EFS_FILENAMELENGTH+2+2
+#define EFS_FILEHEADERSIZE (EFS_FILENAMELENGTH+2+2)
 #define EFS_PAGESIZE 16
 
 //typedef signed char uint8_t;
@@ -124,6 +124,7 @@ private:
 	// number of slots and slotsizes
 	uint8_t nslots;
 	unsigned int slotsize;
+	unsigned int maxfilesize;
 
 	// paging mechanism
 	int  pagenumber;
