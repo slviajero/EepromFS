@@ -210,6 +210,7 @@ uint8_t EepromFS::remove(const char* fn){
 
 // rename 
 uint8_t EepromFS::rename(const char* ofn, const char* nfn){
+	if (findfile(nfn)) return 0;
 	uint8_t file=findfile(ofn);
 	putfilename(file, nfn);
 	return file;
