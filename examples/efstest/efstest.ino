@@ -3,7 +3,6 @@
 
 EepromFS EFS(0x50, 32768);
 
-
 void formattest() {
   Serial.println("Formating 32 slots");
   long t=millis();
@@ -42,9 +41,11 @@ void readtest(char *n) {
   Serial.println("Bytes in file:");  
   Serial.println(EFS.available(f));
 
+  long t=millis();
   if (f) for(int i=0; i<256 && ! EFS.eof(f); i++) Serial.write(EFS.fgetc(f));
   else Serial.println("Read error");
-  Serial.println();
+  t=millis()-t;
+  Serial.print("Read baud rate: "); Serial.println(11*8/t);
   
   EFS.fclose(f);
 
