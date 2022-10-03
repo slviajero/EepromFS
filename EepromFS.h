@@ -13,7 +13,7 @@
 
 	Everything is stores as uint8_8.
 
-	One page of 24 bytes if buffered. The pagesize should be less than 
+	One page of 16 bytes if buffered. The pagesize should be less than 
 	30 bytes to fit into one I2C package of the wire library.
 
 */ 
@@ -25,6 +25,7 @@
 #define EFS_FILENAMELENGTH 12
 #define EFS_FILEHEADERSIZE (EFS_FILENAMELENGTH+2+2)
 #define EFS_PAGESIZE 16
+#define EFSWRITEDELAY 10
 
 //typedef signed char uint8_t;
 
@@ -33,7 +34,7 @@ public:
 /* 
 	constructor 
 */
-	EepromFS(uint8_t e, unsigned int sz);
+	EepromFS(uint8_t e, unsigned long sz);
 
 /*
 	begin method - main purpose is connection to the
@@ -93,7 +94,7 @@ public:
 private:
 	// the eeprom address
 	uint8_t eepromaddr;
-	unsigned int eepromsize;
+	unsigned long eepromsize;
 
 	// headers and files
 	char fnbuffer[EFS_FILENAMELENGTH];

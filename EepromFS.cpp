@@ -1,7 +1,7 @@
 #include "EepromFS.h"
 
 // lazy constructor
-EepromFS::EepromFS(uint8_t e, unsigned int sz) {
+EepromFS::EepromFS(uint8_t e, unsigned long sz) {
 	eepromsize=sz;
 	eepromaddr=e;
 	pagenumber=-1;
@@ -59,7 +59,7 @@ void EepromFS::rawflush(){
 		Wire.write((int)pa%256);
 		if (Wire.write(pagebuffer, EFS_PAGESIZE) != EFS_PAGESIZE) ferror|=1;
 		ferror+=2*Wire.endTransmission();
-		delay(10); // the write delay according to the AT24x datasheet
+		delay(EFSWRITEDELAY); // the write delay according to the AT24x datasheet
 		pagechanged=false;
 	}
 }
