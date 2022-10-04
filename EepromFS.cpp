@@ -24,7 +24,7 @@ uint8_t EepromFS::rawread(unsigned int a){
 		// and then get data
 		Wire.requestFrom((int)eepromaddr, (int)EFS_PAGESIZE);
 		// wait for wire to respond and yield in the meantime
-		uint8_t dc=0;
+		int dc=0;
 		while( !Wire.available() && dc++ < 1000) delay(0);
 		// collect the data
 		if (Wire.available() == EFS_PAGESIZE) {
