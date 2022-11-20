@@ -14,6 +14,9 @@ uint8_t EepromFS::rawread(unsigned int a){
 	// the new page needs to be loaded
 	int p=a/EFS_PAGESIZE;
 	if (p != pagenumber) {
+		// on page fault
+		// flush the page before reloading
+		rawflush();
 		// load the page 
 		// send the address
 		Wire.beginTransmission(eepromaddr);
@@ -59,7 +62,7 @@ void EepromFS::rawflush(){
 		Wire.write((int)pa%256);
 		if (Wire.write(pagebuffer, EFS_PAGESIZE) != EFS_PAGESIZE) ferror|=1;
 		ferror+=2*Wire.endTransmission();
-		delay(EFSWRITEDELAY); // the write delay according to the AT24x datasheet
+		delay(10); // the write delay according to the AT24x datasheet
 		pagechanged=false;
 	}
 }
