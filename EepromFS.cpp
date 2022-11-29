@@ -1,6 +1,6 @@
 #include "EepromFS.h"
 
-// lazy constructor
+// lazy constructor - has the size as argument
 EepromFS::EepromFS(uint8_t e, unsigned long sz) {
 	eepromsize=sz;
 	eepromaddr=e;
@@ -8,6 +8,42 @@ EepromFS::EepromFS(uint8_t e, unsigned long sz) {
 	pagechanged=false;
 	ferror=0;
 };
+
+// even lazier constructor - no size
+EepromFS::EepromFS(uint8_t e) {
+	eepromsize=0;
+	eepromaddr=e;
+	pagenumber=-1;
+	pagechanged=false;
+	ferror=0;
+};
+
+uint8_t EepromFS::readbyte(unsigned int a) {
+
+	// send the address
+	Wire.beginTransmission(eepromaddr);
+	Wire.write((int)a/256);
+	Wire.write((int)a%256);
+	ferror=Wire.endTransmission();
+
+	// get a byte
+	if (ferror == 0) {
+		Wire.requestFrom((int)eepromaddr, (int)1);
+		return Wire.read();
+	} else 
+		return 0;
+};
+
+void EepromFS::writebyte(unsigned int a, uint8_t v) {
+	// send the address and the byte
+	Wire.beginTransmission(eepromaddr);
+	Wire.write((int)a/256);
+	Wire.write((int)a%256);
+	Wire.write((int) v);
+	ferror=Wire.endTransmission();
+	delay(5);
+};
+
 
 // the raw sequential read method 
 uint8_t EepromFS::rawread(unsigned int a){
@@ -70,6 +106,19 @@ void EepromFS::rawflush(){
 
 // begin wants a formated filesystem
 uint8_t EepromFS::begin() { 
+
+	// find the size this only works for 4096 and 32768 eeproms 
+	if (eepromsize == 0) {
+		uint8_t c4 = readbyte(4094);
+		uint8_t c32 = readbyte(32766);
+		writebyte(4094, 42);
+    	writebyte(32766, 84);
+  		if (ferror !=0 ) return;
+  		if (readbyte(32766) == 84 && readbyte(4094) == 42) eepromsize = 32767; else eepromsize = 4096;
+  		writebyte(4094, c4);
+ 		writebyte(32766, c32);	
+	}
+
 	slotsize=0;
 	maxfilesize=0;
 	nslots=0;
@@ -322,4 +371,8 @@ int EepromFS::available(uint8_t f) {
 
 unsigned int EepromFS::size() {
 	return slotsize;
+}
+
+unsigned long EepromFS::esize() {
+	return eepromsize;
 }

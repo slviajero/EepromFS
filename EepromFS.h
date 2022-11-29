@@ -35,6 +35,7 @@ public:
 	constructor 
 */
 	EepromFS(uint8_t e, unsigned long sz);
+	EepromFS(uint8_t e);
 
 /*
 	begin method - main purpose is connection to the
@@ -90,11 +91,16 @@ public:
 	uint8_t getdata(uint8_t s, unsigned int i);
 	void putdata(uint8_t s, unsigned int i, uint8_t d);
 	unsigned int size();
+	unsigned long esize();
 
 private:
 	// the eeprom address
 	uint8_t eepromaddr;
 	unsigned long eepromsize;
+
+	// the helpers for Wire
+	uint8_t readbyte(unsigned int a);
+	void writebyte(unsigned int a, uint8_t v);
 
 	// headers and files
 	char fnbuffer[EFS_FILENAMELENGTH];
