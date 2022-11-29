@@ -53,6 +53,13 @@ method which checks the header and initializes the internal variables. An object
 
 has to be declared with the EEPROM I2C address and the size as parameters.
 
+Alternatively 
+
+	EepromEFS MyEFS(0x50)
+
+will contruct and objects that tries to determine the size of the EEPROM automatically.
+Currently 4k and 32k EEPROMS are implemented.
+
 Buffer size for EEPROM access is 16 bytes. Maximum filename length is 12 bytes. All ASCII characters are allowed as a file name. 
 
 ## POSIX API
