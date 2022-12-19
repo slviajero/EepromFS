@@ -113,7 +113,7 @@ uint8_t EepromFS::begin() {
 		uint8_t c32 = readbyte(32766);
 		writebyte(4094, 42);
     	writebyte(32766, 84);
-  		if (ferror !=0 ) return;
+  		if (ferror !=0 ) return 0;
   		if (readbyte(32766) == 84 && readbyte(4094) == 42) eepromsize = 32767; else eepromsize = 4096;
   		writebyte(4094, c4);
  		writebyte(32766, c32);	
