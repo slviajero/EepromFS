@@ -164,6 +164,7 @@ uint8_t EepromFS::fopen(const char* fn, const char* m) {
 		if (*m == 'a') ofilepos=ofilesize;
 		return ofile;
 	}
+	return 0;
 }
 
 // close a file - and write the correct filesize 
@@ -188,6 +189,7 @@ uint8_t EepromFS::fclose (uint8_t f){
 uint8_t EepromFS::fclose (const char* m){
 	if (*m == 'r') return fclose(ifile); 
 	if (*m == 'w' || *m == 'a') return fclose(ofile);
+	return 0;
 }
 
 // end of file on read 
